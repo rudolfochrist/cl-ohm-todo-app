@@ -7,7 +7,11 @@
                 #:define-easy-handler
                 #:redirect)
   (:import-from :cl-ohm
-                #:filter))
+                #:filter)
+  (:export
+   #:start-server
+   #:stop-server))
+
 (in-package :cl-ohm-todo-app)
 
 (defparameter *acceptor* nil

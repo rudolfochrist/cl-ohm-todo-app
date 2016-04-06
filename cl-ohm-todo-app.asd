@@ -15,5 +15,4 @@
                         ((:file "cl-ohm-todo-app")
                          (:file "data")
                          (:file "routes"))))
-  :description ""
-  :in-order-to ((test-op (load-op :cl-ohm-todo-app-test))))
+  :description "CL-OHM usage example.")
