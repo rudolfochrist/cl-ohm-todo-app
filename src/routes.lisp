@@ -65,18 +65,13 @@
   (redirect "/todos"))
 
 (define-easy-handler (complete-all :uri "/todos/complete-all") ()
-  (ohm:with-connection ()
-    (ohm:with-transaction
-      (let ((todos (ohm:elements (filter 'todo))))
-        (dolist (todo todos)
-          (setf (completedp todo) t)
-          (ohm:save todo)))))
+  (dolist (todo (ohm:elements (filter 'todo)))
+    (setf (completedp todo) t)
+    (ohm:save todo))
   (redirect "/todos"))
 
 (define-easy-handler (cleanup :uri "/todos/cleanup") ()
-  (ohm:with-connection ()
-    (ohm:with-transaction
-      (dolist (todo (ohm:elements (filter 'todo)))
-        (when (string-equal (completedp todo) "t")
-          (ohm:del todo)))))
+  (dolist (todo (ohm:elements (filter 'todo)))
+    (when (string-equal (completedp todo) "t")
+      (ohm:del todo)))
   (redirect "/todos"))
