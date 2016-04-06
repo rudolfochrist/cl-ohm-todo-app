@@ -29,13 +29,15 @@
                     (htm
                      (:ul :class "todos"
                           (loop for todo in all-todos
-                             do (htm (:li (if (string-equal (completedp todo) "t")
-                                              (htm (:del (str (description todo)))
-                                                   (:a :href (format nil "/todos/delete-todo?id=~A" (ohm::ohm-id todo))
-                                                       "Delete task"))
-                                              (htm (str (description todo))
-                                                   (:a :href (format nil "/todos/mark-complete?id=~A&complete=complete" (ohm::ohm-id todo))
-                                                       "Complete task"))))))))))))))
+                             do (htm
+                                 (:li
+                                  (if (string-equal (completedp todo) "t")
+                                      (htm (:del (str (description todo)))
+                                           (:a :href (format nil "/todos/delete-todo?id=~A" (ohm::ohm-id todo))
+                                               "Delete task"))
+                                      (htm (str (description todo))
+                                           (:a :href (format nil "/todos/mark-complete?id=~A&complete=complete" (ohm::ohm-id todo))
+                                               "Complete task"))))))))))))))
     (:post
      (ohm:create 'todo :description description)
      (redirect "/todos"))))
