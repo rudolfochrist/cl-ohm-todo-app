@@ -4,7 +4,7 @@ Just a simple [[https://github.com/rudolfochrist/cl-ohm][CL-OHM]] usage example.
 
 * Usage
 
-1. Load the =cl-ohm-todo-app= example.
+1. Load the =cl-ohm-todo-app= system.
 2. =(cl-ohm-todo-app:start-server)=
 3. Browse to [[http://localhost:4242]]
 4. To stop the server run =(cl-ohm-todo-app:stop-server)=
