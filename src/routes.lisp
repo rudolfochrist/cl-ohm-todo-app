@@ -20,6 +20,8 @@
           (unless (zerop (length all-todos))
             (htm (:br)
                  (:a :href "/todos/complete-all" "Complete all todos.")
+                 (:br)
+                 (:a :href "/todos/cleanup" "Remove comleted tasks.")
                  (:p (fmt "~D item~P left" active-todos active-todos))))
           (:div :class "todo-container"
                 (if (zerop (length all-todos))
@@ -69,4 +71,12 @@
         (dolist (todo todos)
           (setf (completedp todo) t)
           (ohm:save todo)))))
+  (redirect "/todos"))
+
+(define-easy-handler (cleanup :uri "/todos/cleanup") ()
+  (ohm:with-connection ()
+    (ohm:with-transaction
+      (dolist (todo (ohm:elements (filter 'todo)))
+        (when (string-equal (completedp todo) "t")
+          (ohm:del todo)))))
   (redirect "/todos"))
