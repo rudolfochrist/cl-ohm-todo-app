@@ -4,7 +4,8 @@
 (defpackage #:cl-ohm-todo-app
   (:use :cl :cl-who)
   (:import-from :hunchentoot
-                #:define-easy-handler)
+                #:define-easy-handler
+                #:redirect)
   (:import-from :cl-ohm
                 #:filter))
 (in-package :cl-ohm-todo-app)

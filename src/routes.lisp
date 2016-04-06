@@ -3,7 +3,7 @@
 (in-package :cl-ohm-todo-app)
 
 (define-easy-handler (home :uri "/") ()
-  (hunchentoot:redirect "/todos"))
+  (redirect "/todos"))
 
 (define-easy-handler (index :uri "/todos")
     ((description :request-type :post))
@@ -16,6 +16,9 @@
          (:body
           (:h1 "VSTM -- A Very Simple Task Manager")
           (:a :href "/todos/new" "Add new task")
+          (unless (zerop (ohm:size all-todos))
+            (htm (:br)
+                 (:a :href "/todos/complete-all" "Complete all todos.")))
           (:div :class "todo-container"
                 (if (zerop (ohm:size all-todos))
                     (htm (:p "No tasks available."))
@@ -31,7 +34,7 @@
                                                        "Complete task"))))))))))))))
     (:post
      (ohm:create 'todo :description description)
-     (hunchentoot:redirect "/todos"))))
+     (redirect "/todos"))))
 
 (define-easy-handler (new :uri "/todos/new") ()
   (with-html-output-to-string (out nil :prologue t :indent t)
@@ -50,9 +53,18 @@
     (when complete
       (setf (completedp todo) t)
       (ohm:save todo)))
-  (hunchentoot:redirect "/todos"))
+  (redirect "/todos"))
 
 (define-easy-handler (delete-todo :uri "/todos/delete-todo")
     (id)
   (ohm:del (filter-id 'todo id))
-  (hunchentoot:redirect "/todos"))
+  (redirect "/todos"))
+
+(define-easy-handler (complete-all :uri "/todos/complete-all") ()
+  (ohm:with-connection ()
+    (ohm:with-transaction
+      (let ((todos (ohm:elements (filter 'todo))))
+        (dolist (todo todos)
+          (setf (completedp todo) t)
+          (ohm:save todo)))))
+  (redirect "/todos"))
