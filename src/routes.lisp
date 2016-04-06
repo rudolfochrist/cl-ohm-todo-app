@@ -9,22 +9,24 @@
     ((description :request-type :post))
   (ecase (hunchentoot:request-method*)
     (:get
-     (let ((all-todos (filter 'todo)))
+     (let* ((all-todos (ohm:elements (filter 'todo)))
+            (active-todos (loop for todo in all-todos count (string-equal "nil" (completedp todo)))))
        (with-html-output-to-string (output nil :prologue t :indent t)
          (:head
           (:title "Simple Task Manager"))
          (:body
           (:h1 "VSTM -- A Very Simple Task Manager")
           (:a :href "/todos/new" "Add new task")
-          (unless (zerop (ohm:size all-todos))
+          (unless (zerop (length all-todos))
             (htm (:br)
-                 (:a :href "/todos/complete-all" "Complete all todos.")))
+                 (:a :href "/todos/complete-all" "Complete all todos.")
+                 (:p (fmt "~D item~P left" active-todos active-todos))))
           (:div :class "todo-container"
-                (if (zerop (ohm:size all-todos))
+                (if (zerop (length all-todos))
                     (htm (:p "No tasks available."))
                     (htm
                      (:ul :class "todos"
-                          (loop for todo in (ohm:elements all-todos)
+                          (loop for todo in all-todos
                              do (htm (:li (if (string-equal (completedp todo) "t")
                                               (htm (:del (str (description todo)))
                                                    (:a :href (format nil "/todos/delete-todo?id=~A" (ohm::ohm-id todo))
