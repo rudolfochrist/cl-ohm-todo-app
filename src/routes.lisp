@@ -19,12 +19,19 @@
           (:div :class "todo-container"
                 (if (zerop (ohm:size all-todos))
                     (htm (:p "No tasks available."))
-                    (loop for todo in (ohm:elements all-todos)
-                       do (htm
-                           (:ul :class "task"
-                                (:li (description todo)))))))))))
+                    (htm
+                     (:ul :class "todos"
+                          (loop for todo in (ohm:elements all-todos)
+                             do (htm (:li (if (string-equal (completedp todo) "t")
+                                              (htm (:del (str (description todo)))
+                                                   (:a :href (format nil "/todos/delete-todo?id=~A" (ohm::ohm-id todo))
+                                                       "Delete task"))
+                                              (htm (str (description todo))
+                                                   (:a :href (format nil "/todos/mark-complete?id=~A&complete=complete" (ohm::ohm-id todo))
+                                                       "Complete task"))))))))))))))
     (:post
-     (format nil "Got it ~A" description))))
+     (ohm:create 'todo :description description)
+     (hunchentoot:redirect "/todos"))))
 
 (define-easy-handler (new :uri "/todos/new") ()
   (with-html-output-to-string (out nil :prologue t :indent t)
@@ -36,3 +43,16 @@
             (:input :type "textfield" :name "description")
             (:input :type "submit" :value "Create")
             (:a :href "/todos" "Cancel")))))
+
+(define-easy-handler (mark-complete :uri "/todos/mark-complete")
+    (id complete)
+  (let ((todo (filter-id 'todo id)))
+    (when complete
+      (setf (completedp todo) t)
+      (ohm:save todo)))
+  (hunchentoot:redirect "/todos"))
+
+(define-easy-handler (delete-todo :uri "/todos/delete-todo")
+    (id)
+  (ohm:del (filter-id 'todo id))
+  (hunchentoot:redirect "/todos"))
